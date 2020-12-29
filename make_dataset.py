@@ -108,3 +108,4 @@ with open(testdata,'r',encoding='utf-8') as f:
 
     np.save('../dataset'+os.sep+'test'+os.sep+'x_test.npy', np.array(x_test))
     np.save('../dataset'+os.sep+'test'+os.sep+'y_test.npy', np.array(y_test))
+
