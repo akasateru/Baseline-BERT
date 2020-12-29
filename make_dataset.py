@@ -41,20 +41,23 @@ def load_data(texts):
     return [indices, indices_mask]
 
 #class
-with open('../data'+os.sep+'yahootopic'+os.sep+'classes.txt','r',encoding='utf-8',errors='ignore')as f:
+with open('../data'+os.sep+'yahootopic'+os.sep+'classes.csv','r',encoding='utf-8',errors='ignore')as f:
     x = f.read().splitlines()
+    x = csv.reader(f)
     class_0 = []
     class_1 = []
     classes = []
     for i,row in enumerate(x):
-        classes.append([i,row])
+        classes.append([i,row[1]])
         if i%2 == 0:
-            class_0.append([i,row])
+            class_0.append([i,row[1]])
         elif i%2 == 1:
-            class_1.append([i,row])
-    
+            class_1.append([i,row[1]])
+
     print('class_0:',class_0)
     print('class_1:',class_1)
+
+a
 
 traindata = '../data'+os.sep+'yahootopic'+os.sep+'train_pu_half_v1.txt'
 testdata = '../data'+os.sep+'yahootopic'+os.sep+'test.txt'
@@ -81,7 +84,7 @@ with open(traindata,'r',encoding='utf-8') as f:
 
     x_train = load_data(train)
     y_train = [1]*len(train_rand) + [0]*len(train_rand)
-    
+
     print('len x_train:',len(x_train[0]))
     print('len y_train:',len(y_train))
 
