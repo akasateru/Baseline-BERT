@@ -42,7 +42,6 @@ def load_data(texts):
 
 #class
 with open('../data'+os.sep+'yahootopic'+os.sep+'classes.csv','r',encoding='utf-8',errors='ignore')as f:
-    x = f.read().splitlines()
     x = csv.reader(f)
     class_0 = []
     class_1 = []
@@ -56,8 +55,6 @@ with open('../data'+os.sep+'yahootopic'+os.sep+'classes.csv','r',encoding='utf-8
 
     print('class_0:',class_0)
     print('class_1:',class_1)
-
-a
 
 traindata = '../data'+os.sep+'yahootopic'+os.sep+'train_pu_half_v1.txt'
 testdata = '../data'+os.sep+'yahootopic'+os.sep+'test.txt'

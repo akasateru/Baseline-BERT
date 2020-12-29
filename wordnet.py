@@ -19,7 +19,7 @@ for text in texts:
 
 print(wordnet)
 
-with open('../data/yahootopic/classes.csv','w',encoding='utf-8') as f:
+with open('../data/yahootopic/classes.csv','w',encoding='utf-8',newline='') as f:
     writer = csv.writer(f)
     for t,w in zip(texts,wordnet):
         writer.writerow([t,w])
