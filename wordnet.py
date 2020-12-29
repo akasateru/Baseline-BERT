@@ -2,7 +2,7 @@ from nltk.corpus import wordnet as wn
 import nltk
 import csv
 
-# nltk.download("wordnet")
+nltk.download("wordnet")
 
 with open('../data/yahootopic/classes.txt','r',encoding='utf-8') as f:
     texts = f.read().splitlines()
