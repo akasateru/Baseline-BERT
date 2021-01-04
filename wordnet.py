@@ -14,10 +14,13 @@ for text in texts:
     for word in text:
         word = wn.synsets(word)
         dif = word[0].definition()
+        dif = 'this text is about '+dif+' .'
         dif_all.append(dif)
-    wordnet.append(' & '.join(dif_all))
+    wordnet.append(' '.join(dif_all))
 
-print(wordnet)
+for w in wordnet:
+    print(w)
+    print('\n')
 
 with open('../data/yahootopic/classes.csv','w',encoding='utf-8',newline='') as f:
     writer = csv.writer(f)
