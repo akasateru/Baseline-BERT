@@ -56,10 +56,10 @@ with open('../data'+os.sep+'yahootopic'+os.sep+'classes.csv','r',encoding='utf-8
     print('class_0:',class_0)
     print('class_1:',class_1)
 
-traindata = '../data'+os.sep+'yahootopic'+os.sep+'train_pu_half_v0.txt'
-testdata = '../data'+os.sep+'yahootopic'+os.sep+'train_pu_half_v1.txt'
-useclasstrain = class_0
-useclasstest = class_1
+traindata = '../data'+os.sep+'yahootopic'+os.sep+'train_pu_half_v1.txt'
+testdata = '../data'+os.sep+'yahootopic'+os.sep+'train_pu_half_v0.txt'
+useclasstrain = class_1
+useclasstest = class_0
 
 #traindata
 with open(traindata,'r',encoding='utf-8') as f:
