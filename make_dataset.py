@@ -33,8 +33,6 @@ def load_data(texts):
     indices = []
     indices_mask = []
     for text in tqdm(texts):
-        print(text[0])
-        print(text[1])
         ids,masked_ids = tokenizer.encode(text[0],text[1],max_len=64)
         indices.append(ids)
         indices_mask.append(masked_ids)
