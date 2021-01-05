@@ -70,12 +70,14 @@ with open(traindata,'r',encoding='utf-8') as f:
         text = text.split('\t')
         for c in useclasstrain:
             if c[0] == int(text[0]):
-                train.append([chenge_text(text[1]),c[1]])
+                # train.append([chenge_text(text[1]),c[1]])
+                train.append([text[1],c[1]])
                 break
         rand_base = [c[1] for c in useclasstrain]
         rand_base.remove(train[i][1])
         rand = np.random.choice(rand_base)
-        train_rand.append([chenge_text(text[1]),rand])
+        # train_rand.append([chenge_text(text[1]),rand])
+        train_rand.append([text[1],rand])
 
     train = train + train_rand
 
@@ -96,7 +98,8 @@ with open(testdata,'r',encoding='utf-8') as f:
     for i,text in tqdm(enumerate(texts),total=len(texts)):
         text = text.split('\t')
         for j,c in enumerate(useclasstest):
-            test.append([chenge_text(text[1]),c[1]])
+            # test.append([chenge_text(text[1]),c[1]])
+            test.append([text[1],c[1]])
             if c[0] == int(text[0]):
                 test_label.append(j)
 
