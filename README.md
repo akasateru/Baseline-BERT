@@ -1,1 +1,16 @@
-
+- ファイル名：
+    - baseline BERT 6.0
+- 説明
+    - クラスの仮定をthis text is クラス名にした場合
+    - yahootopicv1で学習、dbpediaでテスト
+    - max_len = 128
+- 学習データ
+    - ../data/yahootopic/train_pu_half_v0.txt
+- テストデータ
+    - ../data/dbpeida/dbpedia_csv/test.csv
+- パラメータ
+    - BATCH_SIZE = 32
+    - EPOCHS = 20
+    - LR = 5e-5
+    - SEQ_LEN = 64
+    - BERT_DIM = 768

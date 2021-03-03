@@ -54,7 +54,6 @@ output = Dense(units=1, activation='sigmoid')(inputs)
 model = Model(inputs, output)
 model.summary()
 
-# lr=0.001,
 model.compile(
     optimizer=Adam(beta_1=0.9,beta_2=0.999),
     loss='binary_crossentropy',

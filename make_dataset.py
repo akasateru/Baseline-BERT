@@ -7,8 +7,12 @@ import numpy as np
 from keras_bert import Tokenizer
 import codecs
 from tqdm import tqdm
+import json
 
 np.random.seed(0)
+
+json_file = open('config.json','r')
+config = json.load(json_file)
 
 # 1文ずつ整形
 def chenge_text(text):
@@ -40,7 +44,7 @@ def load_data(texts):
     indices_mask = np.array(indices_mask)
     return [indices, indices_mask]
 
-#class
+#yahoo topic class
 with open('../data'+os.sep+'yahootopic'+os.sep+'classes.csv','r',encoding='utf-8',errors='ignore')as f:
     x = csv.reader(f)
     class_0 = []
@@ -54,15 +58,24 @@ with open('../data'+os.sep+'yahootopic'+os.sep+'classes.csv','r',encoding='utf-8
         elif i%2 == 1:
             class_1.append([i,text])
 
-    print('class_0:',class_0)
-    print('class_1:',class_1)
+    # print('class_0:',class_0)
+    # print('class_1:',class_1)
+
+#dbpedia class
+db_class = []
+with open('../data'+os.sep+'dbpedia'+os.sep+'dbpedia_csv'+os.sep+'classes.txt','r',encoding='utf-8') as f:
+    reader = f.read().splitlines()
+    for i,r in enumerate(reader):
+        db_class.append([i,'this text is about ' + r])
 
 traindata = '../data'+os.sep+'yahootopic'+os.sep+'train_pu_half_v0.txt'
-testdata = '../data'+os.sep+'yahootopic'+os.sep+'test_v1.txt'
+# testdata = '../data'+os.sep+'yahootopic'+os.sep+'test_v0.txt'
+testdata = '../data'+os.sep+'dbpedia'+os.sep+'dbpedia_csv'+os.sep+'test.csv'
 useclasstrain = class_0
-useclasstest = class_1
+# useclasstest = class_0
+useclasstest = db_class
 
-#traindata
+# traindata
 with open(traindata,'r',encoding='utf-8') as f:
     texts = f.read().splitlines()
     train = []
@@ -89,23 +102,33 @@ with open(traindata,'r',encoding='utf-8') as f:
     np.save('../dataset'+os.sep+'train'+os.sep+'x_train.npy', np.array(x_train))
     np.save('../dataset'+os.sep+'train'+os.sep+'y_train.npy', np.array(y_train))
 
-#testdata
 with open(testdata,'r',encoding='utf-8') as f:
-    texts = f.read().splitlines()
+    reader = csv.reader(f)
+    x_test = []
+    y_test = []
     test = []
     test_label = []
-    for i,text in tqdm(enumerate(texts),total=len(texts)):
-        text = text.split('\t')
+    l = len(list(reader))
+    f.seek(0)
+    for row in tqdm(reader,total=l):
+        text_stock = []
+        text = row[2].replace('(',')').split(')')
+        for i,t in enumerate(text):
+            if i % 2 == 0:
+                text_stock.append(t)
+        text = ''.join(text_stock)
+        text = chenge_text(text)
+        text = ' '.join([x for x in text.split(' ') if x not in row[1].split(' ')])
+        text = text.replace('  ',' ')
         for j,c in enumerate(useclasstest):
-            test.append([chenge_text(text[1]),c[1]])
-            if c[0] == int(text[0]):
+            test.append([chenge_text(text),c[1]])
+            if c[0] == int(row[0])-1:
                 test_label.append(j)
     x_test = load_data(test)
     y_test = test_label
 
-    print('len x_test:',len(x_test[0]))
-    print('len y_test:',len(y_test))
+print('len x_test:',len(x_test[0]))
+print('len y_test:',len(y_test))
 
-    np.save('../dataset'+os.sep+'test'+os.sep+'x_test.npy', np.array(x_test))
-    np.save('../dataset'+os.sep+'test'+os.sep+'y_test.npy', np.array(y_test))
-
+np.save('../dataset'+os.sep+'test'+os.sep+'x_test.npy', np.array(x_test))
+np.save('../dataset'+os.sep+'test'+os.sep+'y_test.npy', np.array(y_test))
