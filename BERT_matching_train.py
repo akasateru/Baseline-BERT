@@ -2,6 +2,7 @@ import numpy as np
 import os
 import csv
 import codecs
+import json
 from keras_bert import load_trained_model_from_checkpoint
 from keras_bert import Tokenizer
 from keras.optimizers import Adam
@@ -19,26 +20,30 @@ from sklearn import metrics
 from keras_layer_normalization import LayerNormalization
 import tensorflow as tf
 
-x_train = np.load('../dataset'+os.sep+'train'+os.sep+'x_train.npy').tolist()
-y_train = np.load('../dataset'+os.sep+'train'+os.sep+'y_train.npy')
-x_train =[np.array(x_train[0]),np.array(x_train[1])]
+# パラメータの読み込み
+json_file = open('config.json')
+config = json.load(json_file)
+BATCH_SIZE = config['BATCH_SIZE']
+EPOCHS = config['EPOCHS']
+LR = config['LR']
+SEQ_LEN = config['SEQ_LEN']
+BERT_DIM = config['BERT_DIM']
 
-BATCH_SIZE = 32
-EPOCHS = 20
-LR = 5e-5
-SEQ_LEN = 64
-BERT_DIM = 768
-
+# BERTの読み込み
 pretrained_path = '../uncased_L-12_H-768_A-12'
 config_path = os.path.join(pretrained_path, 'bert_config.json')
 checkpoint_path = os.path.join(pretrained_path, 'bert_model.ckpt')
 vocab_path = os.path.join(pretrained_path, 'vocab.txt')
 
+# 学習データ読み込み
+x_train = np.load('../dataset/train/x_train.npy').tolist()
+y_train = np.load('../dataset/train/y_train.npy')
+x_train =[np.array(x_train[0]),np.array(x_train[1])]
+
 bert = load_trained_model_from_checkpoint(
     config_path,
     checkpoint_path,
     training=True,
-    trainable=True,
     seq_len=SEQ_LEN
 )
 

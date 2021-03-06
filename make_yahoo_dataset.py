@@ -2,6 +2,7 @@ from nltk.corpus import wordnet as wn
 import nltk
 import csv
 
+# クラスの整形
 nltk.download("wordnet")
 
 with open('../data/yahootopic/classes.txt','r',encoding='utf-8') as f:
@@ -27,8 +28,21 @@ for text in texts:
         dif_all.append(dif)
     classes.append(' '.join(dif_all))
 
-
 with open('../data/yahootopic/classes.csv','w',encoding='utf-8',newline='') as f:
     writer = csv.writer(f)
     for t,w in zip(classes,wordnet):
         writer.writerow([t,w])
+
+# 学習データのv0とv1を連結
+with open('../data/yahootopic/train_pu_half_v0.txt','r',encoding='utf-8') as f:
+    text_v0 = f.read()
+
+with open('../data/yahootopic/train_pu_half_v1.txt','r',encoding='utf-8') as f:
+    text_v1 = f.read()
+
+text = text_v0+text_v1
+
+with open('../data/yahootopic/train.txt','w',encoding='utf-8') as f:
+    f.write(text)
+
+

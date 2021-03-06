@@ -2,6 +2,7 @@ import numpy as np
 import os
 import csv
 import codecs
+import json
 from keras_bert import load_trained_model_from_checkpoint
 from keras_bert import Tokenizer
 from keras.optimizers import Adam
@@ -18,19 +19,24 @@ from keras_transformer import gelu
 from sklearn import metrics
 from keras_layer_normalization import LayerNormalization
 
-BATCH_SIZE = 32
-EPOCHS = 20
-LR = 5e-5
-SEQ_LEN = 64
+# パラメータ読み込み
+json_file = open('config.json')
+config = json.load(json_file)
+BATCH_SIZE = config['BATCH_SIZE']
+EPOCHS = config['EPOCHS']
+LR = config['LR']
+SEQ_LEN = config['SEQ_LEN']
 
-x_test = np.load('../dataset'+os.sep+'test'+os.sep+'x_test.npy').tolist()
-y_test = np.load('../dataset'+os.sep+'test'+os.sep+'y_test.npy')
-x_test =[np.array(x_test[0]),np.array(x_test[1])]
-
+# BERT読み込み
 pretrained_path = '../uncased_L-12_H-768_A-12'
 config_path = os.path.join(pretrained_path, 'bert_config.json')
 checkpoint_path = os.path.join(pretrained_path, 'bert_model.ckpt')
 vocab_path = os.path.join(pretrained_path, 'vocab.txt')
+
+# テストデータ読み込み
+x_test = np.load('../dataset/test/x_test.npy').tolist()
+y_test = np.load('../dataset/test/y_test.npy')
+x_test =[np.array(x_test[0]),np.array(x_test[1])]
 
 bert = load_trained_model_from_checkpoint(
     config_path,

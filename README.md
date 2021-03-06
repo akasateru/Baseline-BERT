@@ -1,16 +1,22 @@
 - ファイル名：
-    - baseline BERT 6.0
+    - baseline BERT 7.0
 - 説明
-    - クラスの仮定をthis text is クラス名にした場合
-    - yahootopicv1で学習、dbpediaでテスト
-    - max_len = 128
+    - 学習データにyahoo topicのv0とv1の両方使用し、dbpediaのテストデータでテスト。
+- 共通
+    - クラス情報は"this text is about クラス名."とする。
+    - クラス名が2つある場合、"this text is about クラス名 . this text is about クラス名 ."とする。
 - 学習データ
     - ../data/yahootopic/train_pu_half_v0.txt
+    - ../data/yahootopic/train_pu_half_v1.txt
+    - クラス数：10
+    - データ数：1,300,000
 - テストデータ
     - ../data/dbpeida/dbpedia_csv/test.csv
+    - クラス数：14
+    - データ数：70,000
 - パラメータ
     - BATCH_SIZE = 32
     - EPOCHS = 20
     - LR = 5e-5
-    - SEQ_LEN = 64
+    - SEQ_LEN = 128
     - BERT_DIM = 768
