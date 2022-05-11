@@ -1,18 +1,10 @@
 import numpy as np
 import os
-import csv
-import codecs
 import json
 from keras_bert import load_trained_model_from_checkpoint
-from keras_bert import Tokenizer
-from keras.optimizers import Adam
 from keras.models import Model, load_model
-from keras.layers import Dense
-from keras_bert.backend import keras
 from keras_bert.layers import TokenEmbedding, Extract
 from keras_pos_embd import PositionEmbedding
-from sklearn.metrics import classification_report
-from keras.utils import np_utils
 from keras_position_wise_feed_forward import FeedForward
 from keras_multi_head import MultiHeadAttention
 from keras_transformer import gelu

@@ -1,122 +1,82 @@
 import csv
-import os
-import glob
 import re
 import string
+import json
 import numpy as np
 from keras_bert import Tokenizer
-import codecs
 from tqdm import tqdm
-import json
+from nltk.corpus import wordnet
 
 np.random.seed(0)
-
-json_file = open('config.json','r')
-config = json.load(json_file)
+config = json.load(open('config.json','r'))
 SEQ_LEN = config['SEQ_LEN']
 
-pretrained_path = '../uncased_L-12_H-768_A-12'
-vocab_path = os.path.join(pretrained_path, 'vocab.txt')
+with open('../uncased_L-12_H-768_A-12/vocab.txt','r',encoding='utf8') as f:
+    token_dict = {token:i for i,token in enumerate(f.read().splitlines())}
+tokenizer = Tokenizer(token_dict)
 
-# 1文ずつ整形
-def chenge_text(text):
-    text = text.translate(str.maketrans( '', '',string.punctuation)) #特殊文字除去 !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~
-    text = re.sub(r'[ ]{2,}',' ',text)
+# 前処理
+def preprocessing(text,auth):
+    # 括弧内文章の削除
+    text = re.sub(r'\(.*?\)','',text)
+    # 記号文字の削除
+    text = text.translate(str.maketrans('','',string.punctuation))
+    # 著者名の削除
+    text = text.replace(auth,'')
+    # スペースの調整
+    text = re.sub(r'\s+',' ',text)
     return text
 
-token_dict = {}
-with codecs.open(vocab_path, 'r', 'utf8') as reader:
-    for line in reader:
-        token = line.strip()
-        token_dict[token] = len(token_dict)
+# preprocessing train data -----------------------------------------------------------------------
+# load topic class labels
+with open('../data/topic/classes.txt','r',encoding='utf-8') as f:
+    labels = f.read().splitlines()
+topic_class_hypothesis = dict()
+for i,label in enumerate(labels):
+    topic_class_hypothesis[i] = 'this text is about ' + ' or '.join([wordnet.synsets(word)[0].definition() for word in label.split(' & ')])
 
-# texts:[文章, クラス名]
-def load_data(texts):
-    tokenizer = Tokenizer(token_dict)
-    indices = []
-    indices_mask = []
-    for text in tqdm(texts):
-        ids,masked_ids = tokenizer.encode(text[0],text[1],max_len=SEQ_LEN)
-        indices.append(ids)
-        indices_mask.append(masked_ids)
-    indices = np.array(indices)
-    indices_mask = np.array(indices_mask)
-    return [indices, indices_mask]
+# load train data
+with open('../data/topic/train_pu_half_v0.txt','r',encoding='utf-8') as f:
+    texts_v0 = f.read()
+with open('../data/topic/train_pu_half_v1.txt','r',encoding='utf-8') as f:
+    texts_v1 = f.read()
+texts = texts_v0 + texts_v1
 
-# yahoo topic class
-# classes.csv
-#   ['class名','wordnet']
-with open('../data/yahootopic/classes.csv','r',encoding='utf-8',errors='ignore')as f:
+y_train = []
+indeces, segments = [],[]
+for label_text in tqdm(texts.splitlines()):
+    label,text = label_text.split('\t')
+    rand_base = [0,1,2,3,4,5,6,7,8,9]
+    rand_base.remove(int(label))
+    label_rand = np.random.choice(rand_base)
+    text = preprocessing(text,'')
+    ids, segs = tokenizer.encode(first=text, second=topic_class_hypothesis[int(label)], max_len=SEQ_LEN)
+    indeces.append(ids)
+    segments.append(segs)
+    y_train.append(1)
+    ids, segs = tokenizer.encode(first=text, second=topic_class_hypothesis[int(label_rand)], max_len=SEQ_LEN)
+    indeces.append(ids)
+    segments.append(segs)
+    y_train.append(0)
+x_train = [np.array(indeces),np.array(segments)]
+
+np.save('../dataset/BERT_x_train.npy', x_train)
+np.save('../dataset/BERT_y_train.npy', y_train)
+
+# dbpedia class ------------------------------------------------------------------------------------------------------
+with open('../data/dbpedia_csv/classes.txt','r',encoding='utf-8') as f:
+    dbpedia_class = { i+1:'this text is about '+text for i,text in enumerate(f.read().splitlines())}
+
+with open('../data/dbpedia_csv/test.csv','r',encoding='utf-8') as f:
     reader = csv.reader(f)
-    yahoo_class = []
-    for i,row in enumerate(reader):
-        yahoo_class.append([i,row[0]])
-
-#dbpedia class
-db_class = []
-with open('../data/dbpedia/dbpedia_csv/classes.txt','r',encoding='utf-8') as f:
-    reader = f.read().splitlines()
-    for i,r in enumerate(reader):
-        db_class.append([i,'this text is about ' + r])
-
-traindata = '../data/yahootopic/train.txt'
-testdata = '../data/dbpedia/dbpedia_csv/test.csv'
-useclasstrain = yahoo_class
-useclasstest = db_class
-
-# traindata
-with open(traindata,'r',encoding='utf-8') as f:
-    texts = f.read().splitlines()
-    train = []
-    train_rand = []
-    for i,text in tqdm(enumerate(texts),total=len(texts)):
-        text = text.split('\t')
-        for c in useclasstrain:
-            if c[0] == int(text[0]):
-                train.append([chenge_text(text[1]),c[1]])
-                break
-        rand_base = [c[1] for c in useclasstrain]
-        rand_base.remove(train[i][1])
-        rand = np.random.choice(rand_base)
-        train_rand.append([chenge_text(text[1]),rand])
-
-    train_data = train + train_rand
-    x_train = load_data(train_data)
-    y_train = [1]*len(train) + [0]*len(train_rand)
-
-    print('len x_train:',len(x_train[0]))
-    print('len y_train:',len(y_train))
-
-    np.save('../dataset/train/x_train.npy', np.array(x_train))
-    np.save('../dataset/train/y_train.npy', np.array(y_train))
-
-with open(testdata,'r',encoding='utf-8') as f:
-    reader = csv.reader(f)
-    x_test = []
     y_test = []
-    test = []
-    test_label = []
-    l = len(list(reader))
-    f.seek(0)
-    for row in tqdm(reader,total=l):
-        text_stock = []
-        text = row[2].replace('(',')').split(')')
-        for i,t in enumerate(text):
-            if i % 2 == 0:
-                text_stock.append(t)
-        text = ''.join(text_stock)
-        text = chenge_text(text)
-        text = ' '.join([x for x in text.split(' ') if x not in row[1].split(' ')])
-        text = text.replace('  ',' ')
-        for j,c in enumerate(useclasstest):
-            test.append([chenge_text(text),c[1]])
-            if c[0] == int(row[0])-1:
-                test_label.append(j)
-    x_test = load_data(test)
-    y_test = test_label
+    indeces, segments = [],[]
+    for cls_num,auth,readtext in reader:
+        ids, segs = tokenizer.encode(first=preprocessing(readtext,auth), second=dbpedia_class[int(cls_num)], max_len=SEQ_LEN)
+        indeces.append(ids)
+        segments.append(segs)
+        y_test.append(int(cls_num))
+    x_test = [np.array(indeces),np.array(segments)]
 
-print('len x_test:',len(x_test[0]))
-print('len y_test:',len(y_test))
-
-np.save('../dataset/test/x_test.npy', np.array(x_test))
-np.save('../dataset/test/y_test.npy', np.array(y_test))
+np.save('../dataset/BERT_x_test.npy', x_test)
+np.save('../dataset/BERT_y_test.npy', y_test)

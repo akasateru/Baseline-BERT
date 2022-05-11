@@ -5,7 +5,7 @@ import csv
 # クラスの整形
 nltk.download("wordnet")
 
-with open('../data/yahootopic/classes.txt','r',encoding='utf-8') as f:
+with open('../data/topic/classes.txt','r',encoding='utf-8') as f:
     texts = f.read().splitlines()
 
 wordnet = []
@@ -28,7 +28,7 @@ for text in texts:
         dif_all.append(dif)
     classes.append(' '.join(dif_all))
 
-with open('../data/yahootopic/classes.csv','w',encoding='utf-8',newline='') as f:
+with open('../data/topic/classes.csv','w',encoding='utf-8',newline='') as f:
     writer = csv.writer(f)
     for t,w in zip(classes,wordnet):
         writer.writerow([t,w])

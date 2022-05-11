@@ -1,22 +1,31 @@
-- ファイル名：
-    - baseline BERT 7.0
-- 説明
-    - 学習データにyahoo topicのv0とv1の両方使用し、dbpediaのテストデータでテスト。
-- 共通
-    - クラス情報は"this text is about クラス名."とする。
-    - クラス名が2つある場合、"this text is about クラス名 . this text is about クラス名 ."とする。
-- 学習データ
-    - ../data/yahootopic/train_pu_half_v0.txt
-    - ../data/yahootopic/train_pu_half_v1.txt
+- ファイル名
+    - baseline BERT 8.0
+
+- base matching model
+    - https://storage.googleapis.com/bert_models/2020_02_20/uncased_L-12_H-768_A-12.zip
+
+- 学習データ(fine tuning data)
+    - yahoo topic dataset https://github.com/yinwenpeng/BenchmarkingZeroShot
+    - ../data/topic/train_pu_half_v0.txt
+    - ../data/topic/train_pu_half_v1.txt
     - クラス数：10
     - データ数：1,300,000
+    - クラス情報は、'this text is about (hypothesis)'。クラス名が2つある場合,'this text is about (hypothesis) or (hypothesis)'
+    - (hypothesis) is form wordnet
+    - 各データごとに1つの不正解データを作成。不正解データは10クラスの中から正解データを除いた9クラスの中からランダムに選択。
 - テストデータ
-    - ../data/dbpeida/dbpedia_csv/test.csv
-    - クラス数：14
-    - データ数：70,000
+    - DBpediaデータセット
+    - DBpedia2014から14クラスを選択したもの。
+    - dbpedia_csv
+        - class.txt   14クラス。単語間にスペースを挿入。
+        - readme.txt
+        - train.csv    各40,000 計560,000　
+        - test.csv   各5,000 計70,000
+    - クラス情報は、'this text is about (class name)'。クラス名が2つある場合,'this text is about (class name) or (class name)'
+    - from https://drive.google.com/uc?export=download&id=0Bz8a_Dbh9QhbQ2Vic1kxMmZZQ1k
 - パラメータ
     - BATCH_SIZE = 32
     - EPOCHS = 20
     - LR = 5e-5
-    - SEQ_LEN = 128
+    - SEQ_LEN = 64
     - BERT_DIM = 768
