@@ -2,9 +2,9 @@ import numpy as np
 import os
 import json
 from keras_bert import load_trained_model_from_checkpoint
-from keras.layers import Dense, Input
-from keras.optimizers import Adam
-from keras.models import Model
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.models import Model
 
 # パラメータの読み込み
 json_file = open('config.json')
