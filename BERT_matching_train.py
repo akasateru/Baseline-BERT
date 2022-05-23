@@ -57,13 +57,13 @@ result = model.fit(
     batch_size=BATCH_SIZE
 )
 
-print(result.history.keys())
-import matplotlib.pyplot as plt
-plt.plot(range(1,EPOCHS+1), result.history['acc'], label='acc')
-plt.plot(range(1,EPOCHS+1), result.history['loss'], label='loss')
-plt.xlabel('epoch')
-plt.ylabel('acc')
-plt.legend()
-plt.savefig('plt.jpg')
+# print(result.history.keys())
+# import matplotlib.pyplot as plt
+# plt.plot(range(1,EPOCHS+1), result.history['acc'], label='acc')
+# plt.plot(range(1,EPOCHS+1), result.history['loss'], label='loss')
+# plt.xlabel('epoch')
+# plt.ylabel('acc')
+# plt.legend()
+# plt.savefig('plt.jpg')
 
 model.save('BERT_matching_model.h5')
