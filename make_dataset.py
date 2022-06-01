@@ -44,6 +44,7 @@ texts = texts_v0 + texts_v1
 
 y_train = []
 indeces, segments = [],[]
+i=0
 for label_text in tqdm(texts.splitlines()):
     label,text = label_text.split('\t')
     rand_base = [0,1,2,3,4,5,6,7,8,9]
@@ -65,16 +66,17 @@ np.save('../dataset/BERT_y_train.npy', y_train)
 
 # dbpedia class ------------------------------------------------------------------------------------------------------
 with open('../data/dbpedia_csv/classes.txt','r',encoding='utf-8') as f:
-    dbpedia_class = { i+1:'this text is about '+text for i,text in enumerate(f.read().splitlines())}
+    dbpedia_class = ['this text is about '+text for text in f.read().splitlines()]
 
 with open('../data/dbpedia_csv/test.csv','r',encoding='utf-8') as f:
-    reader = csv.reader(f)
+    reader = [r for r in csv.reader(f)]
     y_test = []
     indeces, segments = [],[]
-    for cls_num,auth,readtext in reader:
-        ids, segs = tokenizer.encode(first=preprocessing(readtext,auth), second=dbpedia_class[int(cls_num)], max_len=SEQ_LEN)
-        indeces.append(ids)
-        segments.append(segs)
+    for cls_num,auth,readtext in tqdm(reader,total=len(reader)):
+        for db_class in dbpedia_class:
+            ids, segs = tokenizer.encode(first=preprocessing(readtext,auth), second=db_class, max_len=SEQ_LEN)
+            indeces.append(ids)
+            segments.append(segs)
         y_test.append(int(cls_num))
     x_test = [np.array(indeces),np.array(segments)]
 

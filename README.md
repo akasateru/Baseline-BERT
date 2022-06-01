@@ -32,7 +32,7 @@ https://drive.google.com/uc?export=download&id=0Bz8a_Dbh9QhbQ2Vic1kxMmZZQ1k
 
 ## パラメータ
 - BATCH_SIZE = 32
-- EPOCHS = 20
+- EPOCHS = 1
 - LR = 5e-5
 - SEQ_LEN = 64
 - BERT_DIM = 768
