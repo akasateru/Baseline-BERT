@@ -27,20 +27,25 @@ def preprocessing(text,auth):
     text = re.sub(r'\s+',' ',text)
     return text
 
-# preprocessing train data -----------------------------------------------------------------------
-# load topic class labels
-with open('../data/topic/classes.txt','r',encoding='utf-8') as f:
-    labels = f.read().splitlines()
-topic_class_hypothesis = dict()
-for i,label in enumerate(labels):
-    topic_class_hypothesis[i] = 'this text is about ' + ' or '.join([wordnet.synsets(word)[0].definition() for word in label.split(' & ')])
+# # preprocessing train data -----------------------------------------------------------------------
+# # load topic class labels
+# print("make train dataset...")
+# with open('../data/topic/classes.txt','r',encoding='utf-8') as f:
+#     labels = f.read().splitlines()
+# topic_class_hypothesis = dict()
+# for i,label in enumerate(labels):
+#     topic_class_hypothesis[i] = 'this text is about ' + ' or '.join([wordnet.synsets(word)[0].definition() for word in label.split(' & ')])
 
-# load train data
-with open('../data/topic/train_pu_half_v0.txt','r',encoding='utf-8') as f:
-    texts_v0 = f.read()
-with open('../data/topic/train_pu_half_v1.txt','r',encoding='utf-8') as f:
-    texts_v1 = f.read()
-texts = texts_v0 + texts_v1
+# # load train data
+# with open('../data/topic/train_pu_half_v0.txt','r',encoding='utf-8') as f:
+#     texts_v0 = f.read()
+# with open('../data/topic/train_pu_half_v1.txt','r',encoding='utf-8') as f:
+#     texts_v1 = f.read()
+# texts = texts_v0 + texts_v1
+
+# ----------------------------------------------------------------------------------------------------
+texts = texts[:100]
+# ----------------------------------------------------------------------------------------------------
 
 y_train = []
 indeces, segments = [],[]
@@ -61,8 +66,8 @@ for label_text in tqdm(texts.splitlines()):
     y_train.append(0)
 x_train = [np.array(indeces),np.array(segments)]
 
-np.save('../dataset/BERT_x_train.npy', x_train)
-np.save('../dataset/BERT_y_train.npy', y_train)
+np.save('../dataset/BERT_x_train_sample.npy', x_train)
+np.save('../dataset/BERT_y_train_sample.npy', y_train)
 
 # dbpedia class ------------------------------------------------------------------------------------------------------
 with open('../data/dbpedia_csv/classes.txt','r',encoding='utf-8') as f:
@@ -70,6 +75,11 @@ with open('../data/dbpedia_csv/classes.txt','r',encoding='utf-8') as f:
 
 with open('../data/dbpedia_csv/test.csv','r',encoding='utf-8') as f:
     reader = [r for r in csv.reader(f)]
+
+    # ----------------------------------------------------------------------------------------------------
+    reader = reader[:100]
+    # ----------------------------------------------------------------------------------------------------
+
     y_test = []
     indeces, segments = [],[]
     for cls_num,auth,readtext in tqdm(reader,total=len(reader)):
@@ -80,5 +90,5 @@ with open('../data/dbpedia_csv/test.csv','r',encoding='utf-8') as f:
         y_test.append(int(cls_num))
     x_test = [np.array(indeces),np.array(segments)]
 
-np.save('../dataset/BERT_x_test.npy', x_test)
-np.save('../dataset/BERT_y_test.npy', y_test)
+np.save('../dataset/BERT_x_test_sample.npy', x_test)
+np.save('../dataset/BERT_y_test_sample.npy', y_test)
